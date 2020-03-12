@@ -1,6 +1,9 @@
 #pragma once
 
 #include<iostream>
+#include<fstream>
+#include<vector>
+#include<string>
 
 #include<glew.h>
 #include<glfw3.h>
@@ -14,4 +17,11 @@
 
 
 #include<SOIL2.h>
+
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 color;
+	glm::vec2 texcoord;
+};
 
