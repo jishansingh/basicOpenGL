@@ -72,16 +72,18 @@ void updateInput(GLFWwindow* window) {
 }
 
 Vertex vertices[] = {
-	glm::vec3(0.0f,0.5f,0.5f) ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),
+	glm::vec3(-0.5f,0.5f,0.f) ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),
 	glm::vec3(-0.5f,-0.5f,0.0f) ,glm::vec3(0.f,1.f,0.f) ,glm::vec2(0.f,0.f),
 	glm::vec3(0.5f,-0.5f,0.0f) ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,0.f),
+	glm::vec3(0.5f,0.5f,0.0f) ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,1.f),
 };
 
 
 unsigned int noOfVertices = sizeof(vertices) / sizeof(Vertex);
 
 GLuint indices[] = {
-	0,1,2
+	0,1,2,
+	0,2,3
 };
 unsigned int noOfIndex = sizeof(indices) / sizeof(GLuint);
 
@@ -158,7 +160,74 @@ int main() {
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 
+	//texture
+	int image_width = 0;
+	int image_height = 0;
+	unsigned char* image = SOIL_load_image("images/pusheen.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+	
 
+
+	GLuint texture0;
+	glGenTextures(1, &texture0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	if (image) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "ERROR::TEXTURE LOADING FAILED" << "\n";
+	}
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+
+	SOIL_free_image_data(image);
+
+
+
+	//texture2
+	int image_width1 = 0;
+	int image_height1 = 0;
+	unsigned char* image1 = SOIL_load_image("images/container.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	if (image1) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "ERROR::TEXTURE LOADING FAILED" << "\n";
+	}
+	glActiveTexture(1);
+	glBindTexture(GL_TEXTURE_2D, 1);
+
+	SOIL_free_image_data(image1);
+
+	//matrix operations
+	glm::mat4 modelMatrix(1.f);
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f));
+	modelMatrix = glm::rotate(modelMatrix,glm::radians(0.f), glm::vec3(1.f,0.f,0.f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(10.f), glm::vec3(0.f, 0.f, 1.f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
+
+	glUseProgram(program);
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1,GL_FALSE,glm::value_ptr(modelMatrix));
+
+
+	glUseProgram(0);
 	//init main loop
 	while (!glfwWindowShouldClose(window)) {
 		//update input
@@ -170,6 +239,24 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glUseProgram(program);
+
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.5f), glm::vec3(0.f, 1.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
+
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+
+		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
+		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture1);
 
 		//bind vao
 		glBindVertexArray(vao);
@@ -183,6 +270,10 @@ int main() {
 
 		glfwSwapBuffers(window);
 		glFlush();
+
+		glBindVertexArray(0);
+		glUseProgram(0);
+
 	}
 	glfwDestroyWindow(window);
 
