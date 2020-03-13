@@ -104,7 +104,7 @@ int main() {
 
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_WIDTH, "mywindow", NULL, NULL);
 
-	//glfwGetFramebufferSize(window, &framebufferwidth, &framebufferheight);
+	glfwGetFramebufferSize(window, &framebufferwidth, &framebufferheight);
 	//glViewport(0, 0, framebufferwidth, framebufferheight);
 
 	glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
@@ -223,8 +223,24 @@ int main() {
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(10.f), glm::vec3(0.f, 0.f, 1.f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
 
+	glm::vec3 camPosition(0.f,0.f,1.f);
+	glm::vec3 worldUp(0.f, 1.f, 0.f);
+	glm::vec3 camFront(0.f, 0.f, -1.f);
+
+	glm::mat4 viewMatrix(1.f);
+	viewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+
+	float fov = 90.f;
+	float nearPlane = 0.1f;
+	float farPlane = 100.f;
+	glm::mat4 projectionMatrix(1.f);
+	projectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(framebufferwidth) / framebufferheight, nearPlane, farPlane);
+
+
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1,GL_FALSE,glm::value_ptr(modelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
 
 	glUseProgram(0);
@@ -242,13 +258,15 @@ int main() {
 
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f));
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.5f), glm::vec3(0.f, 1.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-
+		glfwGetFramebufferSize(window, &framebufferwidth, &framebufferheight);
+		projectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(framebufferwidth) / framebufferheight, nearPlane, farPlane);
+		glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+		
 		glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
 		glUniform1i(glGetUniformLocation(program, "texture1"), 1);
