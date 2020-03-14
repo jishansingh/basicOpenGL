@@ -30,7 +30,7 @@ void main(){
 	float specularConst=pow(max(dot(posToView,relectVec),0),30);
 	vec3 specularFinal=vec3(1.f)*specularConst;
 
-	fs_color=texture(texture0,vs_texcords)*vec4(vs_color,1.0f)*(vec4(ambientLight,1.f)+vec4(diffuse_final,1.f)+vec4(specularFinal,1.f));
+	fs_color=texture(texture0,vs_texcords)*texture(texture1,vs_texcords)*vec4(vs_color,1.0f)*(vec4(ambientLight,1.f)+vec4(diffuse_final,1.f)+vec4(specularFinal,1.f));
 
 	//*texture(texture1,vs_texcords)*vec4(vs_color,1.0f);
 }
