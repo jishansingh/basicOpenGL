@@ -72,10 +72,10 @@ void updateInput(GLFWwindow* window) {
 }
 
 Vertex vertices[] = {
-	glm::vec3(-0.5f,0.5f,0.f) ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),
-	glm::vec3(-0.5f,-0.5f,0.0f) ,glm::vec3(0.f,1.f,0.f) ,glm::vec2(0.f,0.f),
-	glm::vec3(0.5f,-0.5f,0.0f) ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,0.f),
-	glm::vec3(0.5f,0.5f,0.0f) ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,1.f),
+	glm::vec3(-0.5f,0.5f,0.f)   ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),glm::vec3(0.f,0.f,-1.f),
+	glm::vec3(-0.5f,-0.5f,0.0f) ,glm::vec3(0.f,1.f,0.f) ,glm::vec2(0.f,0.f),glm::vec3(0.f,0.f,-1.f),
+	glm::vec3(0.5f,-0.5f,0.0f)  ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,0.f),glm::vec3(0.f,0.f,-1.f),
+	glm::vec3(0.5f,0.5f,0.0f)   ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,1.f),glm::vec3(0.f,0.f,-1.f),
 };
 
 
@@ -86,6 +86,21 @@ GLuint indices[] = {
 	0,2,3
 };
 unsigned int noOfIndex = sizeof(indices) / sizeof(GLuint);
+
+void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		position.z += 0.003f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		position.z -= 0.003f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		rotation.y += 0.01f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		rotation.y -= 0.01f;
+	}
+}
 
 int main() {
 	//init
@@ -158,6 +173,10 @@ int main() {
 	
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(3);
+
 	glBindVertexArray(0);
 
 	//texture
@@ -215,13 +234,20 @@ int main() {
 
 	SOIL_free_image_data(image1);
 
+	
+
 	//matrix operations
+	glm::vec3 position(0.f);
+	glm::vec3 rotation(0.f);
+	glm::vec3 scale(1.f);
+
+
 	glm::mat4 modelMatrix(1.f);
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f));
-	modelMatrix = glm::rotate(modelMatrix,glm::radians(0.f), glm::vec3(1.f,0.f,0.f));
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(10.f), glm::vec3(0.f, 0.f, 1.f));
-	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
+	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f,0.f,0.f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
+	modelMatrix = glm::scale(modelMatrix, scale);
 
 	glm::vec3 camPosition(0.f,0.f,1.f);
 	glm::vec3 worldUp(0.f, 1.f, 0.f);
@@ -238,6 +264,11 @@ int main() {
 
 
 	glUseProgram(program);
+	//lightening
+	glm::vec3 lightPos0(0.f, 0.f, 0.f);
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightPos0"), 1, GL_FALSE, glm::value_ptr(lightPos0));
+	glUniformMatrix4fv(glGetUniformLocation(program, "cameraPos"), 1, GL_FALSE, glm::value_ptr(camPosition));
+
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
@@ -250,17 +281,20 @@ int main() {
 		glfwPollEvents();
 		//update
 		updateInput(window);
-
+		updateInput(window, position, rotation, scale);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glUseProgram(program);
 
-		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(1.f));
+		
+
+		glm::mat4 modelMatrix(1.f);
+		modelMatrix = glm::translate(modelMatrix, position);
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
+		modelMatrix = glm::scale(modelMatrix, scale);
 
 		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		glfwGetFramebufferSize(window, &framebufferwidth, &framebufferheight);
