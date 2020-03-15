@@ -1,6 +1,9 @@
 #include"libs.h"
 #include"Shader.h"
 #include"Texture.h"
+#include"Material.h"
+#include"Vertex.h"
+#include"Mesh.h"
 
 void frameBufferResizeCallback(GLFWwindow*window,int fbW,int fbH) {
 	glViewport(0, 0, fbW, fbH);
@@ -14,10 +17,10 @@ void updateInput(GLFWwindow* window) {
 }
 
 Vertex vertices[] = {
-	glm::vec3(-0.5f,0.5f,0.f)   ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(-0.5f,-0.5f,0.0f) ,glm::vec3(0.f,1.f,0.f) ,glm::vec2(0.f,0.f),glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(0.5f,-0.5f,0.0f)  ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,0.f),glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(0.5f,0.5f,0.0f)   ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,1.f),glm::vec3(0.f,0.f,-1.f),
+	glm::vec3(-0.5f,0.5f,0.f)   ,glm::vec3(1.f,0.f,0.f) ,glm::vec2(0.f,1.f),glm::vec3(0.f,0.f,1.f),
+	glm::vec3(-0.5f,-0.5f,0.0f) ,glm::vec3(0.f,1.f,0.f) ,glm::vec2(0.f,0.f),glm::vec3(0.f,0.f,1.f),
+	glm::vec3(0.5f,-0.5f,0.0f)  ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,0.f),glm::vec3(0.f,0.f,1.f),
+	glm::vec3(0.5f,0.5f,0.0f)   ,glm::vec3(0.f,0.f,1.f) ,glm::vec2(1.f,1.f),glm::vec3(0.f,0.f,1.f),
 };
 
 
@@ -94,6 +97,8 @@ int main() {
 		glfwTerminate();
 	}*/
 	
+	Mesh test(vertices, noOfVertices, indices, noOfIndex);
+
 
 	GLuint vao;
 	glCreateVertexArrays(1, &vao);
@@ -129,7 +134,7 @@ int main() {
 	Texture texture0("images/pusheen.png", GL_TEXTURE_2D, 0);
 	Texture texture1("images/container.png", GL_TEXTURE_2D, 1);
 
-
+	Material material0(glm::vec3(0.1f),glm::vec3(1.f),glm::vec3(1.f),texture0.getTextureUnit(),texture1.getTextureUnit());
 	
 
 	//matrix operations
@@ -199,18 +204,15 @@ int main() {
 		
 		program.setUniformMatrix4fv("projectionMatrix", GL_FALSE, projectionMatrix);
 
-		program.setUniform1i("texture0", texture0.getTextureUnit());
-		program.setUniform1i("texture1", texture1.getTextureUnit());
-
 		texture0.bind();
 		texture1.bind();
-
+		material0.sendToShader(program);
 		//bind vao
 		glBindVertexArray(vao);
 
 		//draw
 		glDrawElements(GL_TRIANGLES, noOfIndex, GL_UNSIGNED_INT, 0);
-
+		test.render(window,&program);
 
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
