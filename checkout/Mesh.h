@@ -4,14 +4,14 @@
 #include"libs.h"
 #include"Vertex.h"
 #include"Shader.h"
-
+#include"Primitives.h"
 class Mesh {
 private:
 	GLuint vao;
 	GLuint vbo;
 	GLuint ibo;
-	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
+	int noOfVertices;
+	int noOfIndices;
 
 	glm::vec3 position;
 	glm::vec3 rotation;
@@ -19,26 +19,50 @@ private:
 
 	glm::mat4 modelMatrix;
 	//functions
-	void initVertexData(Vertex* vertexArray,int noOfVertices,GLuint* indicesArray,int noOfIndices) {
-		for (int i = 0; i < noOfVertices; i++) {
-			vertices.push_back(vertexArray[i]);
-		}
-		for (int i = 0; i < noOfIndices; i++) {
-			indices.push_back(indicesArray[i]);
-		}
-	}
-	void initVAO() {
+	void initVAO(Vertex* vertices, int noOfVertices, GLuint* indices, int noOfIndex) {
+		this->noOfVertices = noOfVertices;
+		this->noOfIndices = noOfIndex;
 		glCreateVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
 		//make vertices
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, noOfVertices*sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &ibo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, noOfIndices*sizeof(GLuint), indices, GL_STATIC_DRAW);
+
+		//tell gpu distribution of vertex
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+		glEnableVertexAttribArray(2);
+
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+		glEnableVertexAttribArray(3);
+
+		glBindVertexArray(0);
+	}
+	void initVAO(Primitive* primitive) {
+		this->noOfVertices = primitive->getNoOfVertices();
+		this->noOfIndices = primitive->getNoOfIndices();
+		glCreateVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+
+		//make vertices
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, noOfVertices * sizeof(Vertex), primitive->getVertices(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, noOfIndices * sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);
 
 		//tell gpu distribution of vertex
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
@@ -67,28 +91,22 @@ private:
 	void updateUniform(Shader* shader) {
 		shader->setUniformMatrix4fv("modelMatrix", GL_FALSE, this->modelMatrix);
 	}
-	void updateInput(GLFWwindow *window) {
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			position.z += 0.003f;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			position.z -= 0.003f;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			rotation.y += 0.01f;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			rotation.y -= 0.01f;
-		}
-	}
+	
 public:
-	Mesh(Vertex* vertexArray, int noOfVertices, GLuint* indicesArray, int noOfIndices) {
+	Mesh(Vertex* vertexArray,int noOfVertices, GLuint* indicesArray,int noOfIndex) {
 		this->position = glm::vec3(0.f);
 		this->rotation = glm::vec3(0.f);
 		this->scale = glm::vec3(1.f);
 
-		this->initVertexData(vertexArray, noOfVertices, indicesArray, noOfIndices);
-		this->initVAO();
+		this->initVAO(vertexArray,noOfVertices, indicesArray,noOfIndex);
+		this->initModelMatrix();
+	}
+	Mesh(Primitive* primitive) {
+		this->position = glm::vec3(0.f);
+		this->rotation = glm::vec3(0.f);
+		this->scale = glm::vec3(1.f);
+
+		this->initVAO(primitive);
 		this->initModelMatrix();
 	}
 	~Mesh(){
@@ -99,17 +117,26 @@ public:
 	void update() {
 
 	}
-	void render(GLFWwindow* window,Shader* shader) {
-		//this->updateInput(window);
+	void render(Shader* shader) {
 		this->initModelMatrix();
 		this->updateUniform(shader);
 
+		shader->Use();
 		//bind vao
 		glBindVertexArray(this->vao);
 
 		//draw
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
+		glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
 	}
+	void move(glm::vec3 pos) {
+		this->position += pos;
+	}
+	void rotate(glm::vec3 rot) {
+		this->rotation += rot;
+	}
+	void scaleUp(glm::vec3 times) {
+		this->scale += times;
+	}
+
 
 };

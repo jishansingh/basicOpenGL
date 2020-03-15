@@ -32,18 +32,18 @@ GLuint indices[] = {
 };
 unsigned int noOfIndex = sizeof(indices) / sizeof(GLuint);
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
+void updateInput(GLFWwindow* window,Mesh & mesh) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		position.z += 0.003f;
+		mesh.move(glm::vec3(0.f,0.f,0.003f));
 	}
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		position.z -= 0.003f;
+		mesh.move(glm::vec3(0.f, 0.f, -0.003f));
 	}
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		rotation.y += 0.01f;
+		mesh.rotate(glm::vec3(0.f, 0.01f, 0.f));
 	}
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		rotation.y -= 0.01f;
+		mesh.rotate(glm::vec3(0.f, -0.01f, 0.f));
 	}
 }
 
@@ -97,7 +97,7 @@ int main() {
 		glfwTerminate();
 	}*/
 	
-	Mesh test(vertices, noOfVertices, indices, noOfIndex);
+	Mesh test(&Quad());
 
 
 	GLuint vao;
@@ -182,7 +182,7 @@ int main() {
 		glfwPollEvents();
 		//update
 		updateInput(window);
-		updateInput(window, position, rotation, scale);
+		updateInput(window, test);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -212,7 +212,7 @@ int main() {
 
 		//draw
 		glDrawElements(GL_TRIANGLES, noOfIndex, GL_UNSIGNED_INT, 0);
-		test.render(window,&program);
+		test.render(&program);
 
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
