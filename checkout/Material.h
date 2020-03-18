@@ -32,4 +32,13 @@ public:
 		prog.setUniform1i("material.specularTex", this->specularTex);
 
 	}
+	void sendToShader(Shader* prog) {
+		prog->setUniform3f("material.ambient", GL_FALSE, this->ambient);
+		prog->setUniform3f("material.diffuse", GL_FALSE, this->diffuse);
+		prog->setUniform3f("material.specular", GL_FALSE, this->specular);
+
+		prog->setUniform1i("material.diffuseTex", this->diffuseTex);
+		prog->setUniform1i("material.specularTex", this->specularTex);
+
+	}
 };

@@ -91,7 +91,20 @@ private:
 	void updateUniform(Shader* shader) {
 		shader->setUniformMatrix4fv("modelMatrix", GL_FALSE, this->modelMatrix);
 	}
-	
+	void updateInput(GLFWwindow* window) {
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			this->rotate(glm::vec3(0.1f, 0.f, 0.f));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			this->rotate(glm::vec3(-0.1f, 0.f, 0.f));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			this->rotate(glm::vec3(0.f, 0.01f, 0.f));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			this->rotate(glm::vec3(0.f, -0.01f, 0.f));
+		}
+	}
 public:
 	Mesh(Vertex* vertexArray,int noOfVertices, GLuint* indicesArray,int noOfIndex) {
 		this->position = glm::vec3(0.f);
@@ -117,10 +130,10 @@ public:
 	void update() {
 
 	}
-	void render(Shader* shader) {
+	void render(Shader* shader,GLFWwindow*window) {
+		this->updateInput(window);
 		this->initModelMatrix();
 		this->updateUniform(shader);
-
 		shader->Use();
 		//bind vao
 		glBindVertexArray(this->vao);

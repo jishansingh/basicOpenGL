@@ -41,7 +41,7 @@ vec4 specFinal(Material mat,vec3 vs_position,vec3 lightPos,vec3 normal,vec3 came
 	vec3 posToView=normalize(cameraPosition-vs_position);
 	float specularConst=pow(max(dot(posToView,relectVec),0),30);
 	vec3 specularFinal=material.specular*specularConst;
-	return vec4(specularFinal,1.f);
+	return vec4(specularFinal,1.f)*texture(material.specularTex,vs_texcords);
 }
 void main(){
 	//fs_color=vec4(vs_color,1.0f);
@@ -55,8 +55,7 @@ void main(){
 	vec4 specFinal=specFinal(material,vs_position,lightPos0,vs_normal,cameraPos);
 
 
-	fs_color=texture(material.diffuseTex,vs_texcords)*texture(material.specularTex,vs_texcords)*vec4(vs_color,1.0f)
+	fs_color=texture(material.diffuseTex,vs_texcords)//*texture(material.specularTex,vs_texcords)*vec4(vs_color,1.0f)
 		*(ambientFinal+diffuseFinal+specFinal);
-
 	//*texture(texture1,vs_texcords)*vec4(vs_color,1.0f);
 }
