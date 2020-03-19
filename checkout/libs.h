@@ -18,5 +18,8 @@
 
 #include<SOIL2.h>
 
-
+struct Vertex2 {
+	glm::vec3 position;
+	glm::vec2 texcoord;
+};
 

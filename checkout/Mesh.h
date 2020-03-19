@@ -28,24 +28,28 @@ private:
 		//make vertices
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, noOfVertices*sizeof(Vertex), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, noOfVertices*sizeof(Vertex2), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &ibo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, noOfIndices*sizeof(GLuint), indices, GL_STATIC_DRAW);
 
 		//tell gpu distribution of vertex
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, position));
 		glEnableVertexAttribArray(0);
 
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, texcoord));
+		glEnableVertexAttribArray(2);
+
+		/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
 		glEnableVertexAttribArray(1);
 
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 		glEnableVertexAttribArray(2);
 
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(3);*/
+		
 
 		glBindVertexArray(0);
 	}
@@ -58,24 +62,27 @@ private:
 		//make vertices
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, noOfVertices * sizeof(Vertex), primitive->getVertices(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, noOfVertices * sizeof(Vertex2), primitive->getVertices(), GL_STATIC_DRAW);
 
 		glGenBuffers(1, &ibo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, noOfIndices * sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);
 
 		//tell gpu distribution of vertex
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, position));
 		glEnableVertexAttribArray(0);
 
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, texcoord));
+		glEnableVertexAttribArray(1);
+
+		/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
 		glEnableVertexAttribArray(1);
 
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 		glEnableVertexAttribArray(2);
 
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(3);*/
 
 		glBindVertexArray(0);
 	}
@@ -93,16 +100,22 @@ private:
 	}
 	void updateInput(GLFWwindow* window) {
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			this->rotate(glm::vec3(0.1f, 0.f, 0.f));
+			this->move(glm::vec3(0.f, 0.f, 0.1f));
 		}
 		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			this->rotate(glm::vec3(-0.1f, 0.f, 0.f));
+			this->move(glm::vec3(0.f, 0.f, -0.1f));
 		}
 		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 			this->rotate(glm::vec3(0.f, 0.01f, 0.f));
 		}
 		else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 			this->rotate(glm::vec3(0.f, -0.01f, 0.f));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+			this->scaleUp(glm::vec3(1.5f));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+			this->scaleUp(glm::vec3(0.5f));
 		}
 	}
 public:
@@ -139,6 +152,10 @@ public:
 		glBindVertexArray(this->vao);
 
 		//draw
+		if (noOfIndices == 0) {
+			glDrawArrays(GL_TRIANGLES,0, noOfVertices);
+			return;
+		}
 		glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
 	}
 	void move(glm::vec3 pos) {

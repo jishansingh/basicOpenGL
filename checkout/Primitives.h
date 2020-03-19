@@ -4,7 +4,7 @@
 
 class Primitive {
 private:
-	std::vector<Vertex>vertices;
+	std::vector<Vertex2>vertices;
 	std::vector<GLuint>indices;
 
 public:
@@ -14,7 +14,7 @@ public:
 	virtual ~Primitive() {
 
 	}
-	void set(Vertex* vertexArray, int noOfVertices, GLuint* indexArray, int noOfIndices) {
+	void set(Vertex2* vertexArray, int noOfVertices, GLuint* indexArray, int noOfIndices) {
 		for (int i = 0; i < noOfVertices; i++) {
 			vertices.push_back(vertexArray[i]);
 		}
@@ -23,7 +23,7 @@ public:
 		}
 	}
 
-	inline Vertex* getVertices() { return vertices.data(); }
+	inline Vertex2* getVertices() { return vertices.data(); }
 	inline GLuint* getIndices() { return indices.data(); }
 
 	inline const unsigned getNoOfVertices() { return vertices.size(); }
@@ -31,7 +31,7 @@ public:
 
 
 };
-
+/*
 class Quad :public Primitive {
 public:
 	Quad() {
@@ -55,3 +55,62 @@ public:
 
 	}
 };
+*/
+class Cube :public Primitive {
+public:
+	Cube() {
+
+		Vertex2 vertices[] = {
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f),
+
+			glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+
+			glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+
+			glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f),
+			glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f),
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f),
+			glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 0.0f),
+			glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)
+		};
+
+
+		unsigned int noOfVertices = sizeof(vertices) / sizeof(Vertex2);
+
+		GLuint indices[1] = {};
+		unsigned int noOfIndex = 0;
+		this->set(vertices, noOfVertices, indices, noOfIndex);
+
+	}
+};
+

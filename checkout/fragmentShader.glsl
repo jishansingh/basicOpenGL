@@ -48,14 +48,14 @@ void main(){
 	//ambient light
 	vec4 ambientFinal=calcAmbient(material);
 
-	vec4 diffuseFinal=calcDiffuse(material,vs_position,lightPos0,vs_normal);
+	//vec4 diffuseFinal=calcDiffuse(material,vs_position,lightPos0,vs_normal);
 	
 	//specular
 
-	vec4 specFinal=specFinal(material,vs_position,lightPos0,vs_normal,cameraPos);
+	//vec4 specFinal=specFinal(material,vs_position,lightPos0,vs_normal,cameraPos);
 
 
-	fs_color=texture(material.diffuseTex,vs_texcords)//*texture(material.specularTex,vs_texcords)*vec4(vs_color,1.0f)
-		*(ambientFinal+diffuseFinal+specFinal);
+	fs_color=texture(material.diffuseTex,vs_texcords);//*texture(material.specularTex,vs_texcords)*vec4(vs_color,1.0f)
+		//*(ambientFinal+diffuseFinal+specFinal);
 	//*texture(texture1,vs_texcords)*vec4(vs_color,1.0f);
 }

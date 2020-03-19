@@ -45,9 +45,11 @@ void Game::initGLEW()
 void Game::initOpenGLOption()
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	/*glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);*/
 	glFrontFace(GL_CCW);
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -83,7 +85,7 @@ void Game::initProjection()
 }
 void Game::initShaders()
 {
-	objShader.push_back(new Shader("vertexShader.glsl", "fragmentShader.glsl", ""));
+	objShader.push_back(new Shader("3DVertexShader.glsl", "3DFragmentshader.glsl", ""));
 }
 void Game::initTextures()
 {
@@ -91,11 +93,11 @@ void Game::initTextures()
 }
 void Game::initMaterials()
 {
-	objMaterial.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), objTexture[0].first->getTextureUnit(), objTexture[0].second->getTextureUnit()));
+	objMaterial.push_back(new Material(glm::vec3(1.f), glm::vec3(1.f), glm::vec3(1.f), objTexture[0].first->getTextureUnit(), objTexture[0].second->getTextureUnit()));
 }
 void Game::initMesh()
 {
-	objMesh.push_back(new Mesh(&Quad()));
+	objMesh.push_back(new Mesh(&Cube()));
 }
 void Game::initLight()
 {
@@ -161,7 +163,6 @@ void Game::render()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	this->objShader[0]->Use();
 
 

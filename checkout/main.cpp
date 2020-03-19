@@ -64,7 +64,7 @@ int main() {
 	int WINDOW_WIDTH = 640;
 	int framebufferwidth = 0;
 	int framebufferheight = 0;
-	Game game("mywindow", WINDOW_WIDTH, WINDOW_HEIGHT, 4, 4, false);
+	Game game("mywindow", WINDOW_WIDTH, WINDOW_HEIGHT, 4, 4, true);
 
 
 	
