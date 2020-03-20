@@ -106,18 +106,18 @@ private:
 		}
 	}
 public:
-	Mesh(Vertex* vertexArray,int noOfVertices, GLuint* indicesArray,int noOfIndex) {
-		this->position = glm::vec3(0.f);
-		this->rotation = glm::vec3(0.f);
-		this->scale = glm::vec3(1.f);
+	Mesh(Vertex* vertexArray,int noOfVertices, GLuint* indicesArray,int noOfIndex, glm::vec3 pos, glm::vec3 rot, glm::vec3 sc) {
+		this->position = pos;
+		this->rotation = rot;
+		this->scale = sc;
 
 		this->initVAO(vertexArray,noOfVertices, indicesArray,noOfIndex);
 		this->initModelMatrix();
 	}
-	Mesh(Primitive* primitive) {
-		this->position = glm::vec3(0.f);
-		this->rotation = glm::vec3(0.f);
-		this->scale = glm::vec3(1.f);
+	Mesh(Primitive* primitive,glm::vec3 pos,glm::vec3 rot,glm::vec3 sc) {
+		this->position = pos;
+		this->rotation = rot;
+		this->scale = sc;
 
 		this->initVAO(primitive);
 		this->initModelMatrix();
@@ -130,8 +130,8 @@ public:
 	void update() {
 
 	}
-	void render(Shader* shader,GLFWwindow*window) {
-		this->updateInput(window);
+	void render(Shader* shader) {
+		//this->updateInput(window);
 		this->initModelMatrix();
 		this->updateUniform(shader);
 		shader->Use();
@@ -139,7 +139,12 @@ public:
 		glBindVertexArray(this->vao);
 
 		//draw
-		glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
+		if (noOfIndices == 0) {
+			glDrawArrays(GL_TRIANGLES, 0, noOfVertices);
+		}
+		else
+			glDrawElements(GL_TRIANGLES, noOfIndices, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 	}
 	void move(glm::vec3 pos) {
 		this->position += pos;

@@ -5,6 +5,9 @@
 #include"Material.h"
 #include"Mesh.h"
 #include"Primitives.h"
+#include"Model.h"
+#include"objLoader.h"
+
 class Game
 {
 private:
@@ -28,13 +31,30 @@ private:
 	float fov;
 	float nearPlane;
 	float farPlane;
-	
+
+	//update time
+	float dt;
+	float curTime;
+	float lastTime;
+
+	//mouse Positions
+	double lastMouseX;
+	double lastMouseY;
+	double mouseX;
+	double mouseY;
+	double mouseOffsetX;
+	double mouseOffsetY;
+	bool firstMouse;
+
+
 	//object properties and looks
 	std::vector<Shader*>objShader;
 	std::vector<std::pair<Texture*, Texture*> >objTexture;
 	std::vector<Material*>objMaterial;
 	std::vector<Mesh*>objMesh;
 	std::vector<glm::vec3>lightPos;
+
+	std::vector<Model*>models;
 
 	//functions
 	void initialize(const char* window_title, bool resizable);
@@ -54,7 +74,13 @@ private:
 	void initLight();
 	//init uniforms
 	void initUniform();
+	void initModel();
 
+
+	void updateKeyboardInput();
+	void updateMouseInput();
+	void updateUniform();
+	void updateDT();
 	//static variables
 	
 public:
