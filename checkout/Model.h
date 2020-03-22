@@ -42,10 +42,11 @@ public:
 
 		//draw
 		//glDrawElements(GL_TRIANGLES, noOfIndex, GL_UNSIGNED_INT, 0);
-		for (auto& i : this->meshes) {
+		/*for (auto& i : this->meshes) {
 			i->render(shader);
-		}
+		}*/
 		
+		this->meshes[0]->render(shader);
 
 	}
 };

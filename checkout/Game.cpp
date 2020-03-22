@@ -52,6 +52,11 @@ void Game::initOpenGLOption()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0x00);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0x00);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -96,7 +101,7 @@ void Game::initTextures()
 }
 void Game::initMaterials()
 {
-	objMaterial.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), objTexture[0].first->getTextureUnit(), objTexture[0].second->getTextureUnit()));
+	objMaterial.push_back(new Material(glm::vec3(1.f), glm::vec3(1.f), glm::vec3(1.f), objTexture[0].first->getTextureUnit(), objTexture[0].second->getTextureUnit()));
 }
 void Game::initMesh()
 {
@@ -106,8 +111,9 @@ void Game::initMesh()
 		glm::vec3(2.f, 0.f, 0.f),
 		glm::vec3(0.f),
 		glm::vec3(1.f)));
-	objMesh.push_back(new Mesh(&Pyramid(),glm::vec3(0.f),glm::vec3(0.f),glm::vec3(1.f)));
-	objMesh.push_back(new Mesh(&Quad(), glm::vec3(1.f), glm::vec3(0.f), glm::vec3(1.f)));
+	/*objMesh.push_back(new Mesh(&Pyramid(),glm::vec3(0.f),glm::vec3(0.f),glm::vec3(1.f)));
+	objMesh.push_back(new Mesh(&Quad(), glm::vec3(1.f), glm::vec3(0.f), glm::vec3(1.f)));*/
+	
 }
 void Game::initLight()
 {
@@ -253,7 +259,8 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	this->objShader[0]->Use();
-	
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
 	this->updateUniform();
 
 	

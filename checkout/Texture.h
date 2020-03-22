@@ -8,11 +8,15 @@ private:
 	int height;
 	GLint textureUnit;
 	GLenum textureType;
+	unsigned char* loadImage(const char* filename) {
+		unsigned char*ans_img=SOIL_load_image(filename, &this->width, &this->height, NULL, SOIL_LOAD_RGBA);
+		return ans_img;
+	}
 public:
 	Texture(const char* filename,GLenum type,GLint texture_unit) {
 		this->textureUnit = texture_unit;
 		this->textureType = type;
-		unsigned char* image = SOIL_load_image(filename, &this->width, &this->height, NULL, SOIL_LOAD_RGBA);
+		unsigned char* image = loadImage(filename);
 
 		glGenTextures(1, &texture_id);
 		glBindTexture(type, texture_id);
